@@ -175,7 +175,8 @@ try
 
         $postBootKey = Split-Path $MinikubeConfiguratorFolder -Leaf
         #postBootCommand = "powershell.exe -ExecutionPolicy bypass `"& $PSCommandPath -Bootstrap`""
-        $postBootCommand = "powershell.exe -ExecutionPolicy bypass `"& '$($MyInvocation.MyCommand.Path))' -Bootstrap`""
+        #postBootCommand = "powershell.exe -ExecutionPolicy bypass `"& '$($MyInvocation.MyCommand.Path))' -Bootstrap`""
+        $postBootCommand = "powershell.exe -ExecutionPolicy bypass -File `"$PSCommandPath`" -Bootstrap"
 
         WriteLog "Register RunOnce script '$postBootKey': $postBootCommand"
 
