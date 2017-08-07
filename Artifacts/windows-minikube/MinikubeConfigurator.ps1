@@ -173,8 +173,9 @@ try
 
     } else {
 
-        $postBootKey = [System.IO.Path]::GetFileNameWithoutExtension($PSCommandPath)
-        $postBootCommand = "powershell.exe -ExecutionPolicy bypass `"& $PSCommandPath -Bootstrap`""
+        $postBootKey = Split-Path $MinikubeConfiguratorFolder -Leaf
+        #postBootCommand = "powershell.exe -ExecutionPolicy bypass `"& $PSCommandPath -Bootstrap`""
+        $postBootCommand = "powershell.exe -ExecutionPolicy bypass `"& '$($MyInvocation.MyCommand.Path))' -Bootstrap`""
 
         WriteLog "Register RunOnce script '$postBootKey': $postBootCommand"
 
