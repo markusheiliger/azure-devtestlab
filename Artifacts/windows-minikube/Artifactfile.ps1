@@ -317,7 +317,7 @@ try
         Add-LocalAdminUser -UserName $UserName -Password $password | Out-Null
     }
 
-    $productType = Get-CimInstance Win32_OperatingSystem | select -ExpandProperty ProductType
+    $productType = Get-CimInstance Win32_OperatingSystem | Select-Object -ExpandProperty ProductType
 
     # Product Type Values
     # 1 - Work Station
@@ -343,7 +343,7 @@ try
 
     Invoke-ChocolateyPackageInstaller -UserName $UserName -Password $Password -PackageList "minikube, kubernetes-cli"
 
-    Invoke-MinikubeConfigurator -UserName $UserName -Password $Password -PackageList "minikube, kubernetes-cli"
+    Invoke-MinikubeConfigurator -UserName $UserName -Password $Password 
 }
 catch
 {
