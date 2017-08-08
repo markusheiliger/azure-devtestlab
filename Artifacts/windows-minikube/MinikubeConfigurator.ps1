@@ -63,10 +63,23 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 # Param and environment check
 #
 
-if (-not $PSCommandPath) {
+try {
+    
+    if (-not $PSCommandPath) {
 
-    // $PSCommandPath is required
-    throw "The PSCommandPath is not given."
+        // $PSCommandPath is required
+        throw "The PSCommandPath is not given."
+    }
+}
+catch {
+
+    $errMsg = $Error[0].Exception.Message
+
+    Write-Error $errMsg
+
+    Start-Sleep -Seconds 10
+
+    throw
 }
 
 ##################################################################################################
