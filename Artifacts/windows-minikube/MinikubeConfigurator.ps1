@@ -208,7 +208,7 @@ try
     } else {
 
         $postBootKey = Split-Path $ScriptFolder -Leaf
-        $postBootFile = Join-Path $PSScriptRoot (Split-Path $PSCommandPath -Leaf)
+        $postBootFile = Join-Path $ScriptFolder (Split-Path $PSCommandPath -Leaf)
         $postBootCommand = "powershell.exe -ExecutionPolicy bypass -File `"$postBootFile`" -Bootstrap"
 
         WriteLog "Copy $PSCommandPath`n  to $postBootFile"
