@@ -67,7 +67,7 @@ try {
     
     if (-not $PSCommandPath) {
 
-        // $PSCommandPath is required
+        # $PSCommandPath is required
         throw "The PSCommandPath is not given."
     }
 }
@@ -93,7 +93,7 @@ $ScriptFolder = Join-Path $env:ALLUSERSPROFILE -ChildPath $("$ScriptName-" + [Sy
 
 if (Test-Path ([System.IO.Path]::ChangeExtension($PSCommandPath, ".log")) -PathType Leaf) {
 
-    // use the current script folder as log location as it already contains a log file
+    # use the current script folder as log location as it already contains a log file
     $ScriptFolder = Split-Path -Path $PSCommandPath -Parent
 }
 
