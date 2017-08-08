@@ -269,12 +269,12 @@ function Invoke-MinikubeConfigurator
 
     $secPassword = ConvertTo-SecureString -String $Password -AsPlainText -Force
     $credential = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($UserName)", $secPassword)
-    $command = "$PSScriptRoot\MinikubeConfigurator.ps1"
 
     $oldPolicyValue = Set-LocalAccountTokenFilterPolicy
     try
     {
-        Invoke-Command -ComputerName $env:COMPUTERNAME -Credential $credential -FilePath $command
+        #Invoke-Command -ComputerName $env:COMPUTERNAME -Credential $credential -FilePath "$PSScriptRoot\MinikubeConfigurator.ps1"
+        Invoke-Command -ComputerName $env:COMPUTERNAME -Credential $credential -ScriptBlock { Set-Location $args[0] ; . .\MinikubeConfigurator.ps1 } -ArgumentList ( $PSScriptRoot )
     }
     finally
     {
