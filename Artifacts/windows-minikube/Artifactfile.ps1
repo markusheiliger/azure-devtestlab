@@ -273,7 +273,6 @@ function Invoke-MinikubeConfigurator
     $oldPolicyValue = Set-LocalAccountTokenFilterPolicy
     try
     {
-        #Invoke-Command -ComputerName $env:COMPUTERNAME -Credential $credential -FilePath "$PSScriptRoot\MinikubeConfigurator.ps1"
         Invoke-Command -ComputerName $env:COMPUTERNAME -Credential $credential -ScriptBlock { Set-Location $args[0] ; . .\MinikubeConfigurator.ps1 } -ArgumentList ( $PSScriptRoot )
     }
     finally

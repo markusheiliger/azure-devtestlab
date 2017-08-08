@@ -42,9 +42,7 @@
 
 Param(
 
-    [switch] $Bootstrap,
-
-    [string] $BootstrapFile = $PSCommandPath
+    [switch] $Bootstrap
 )
 
 ##################################################################################################
@@ -62,13 +60,31 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 ###################################################################################################
 
 #
-# Custom Configurations
+# Param and environment check
 #
 
-$MinikubeConfiguratorFolder = Join-Path $env:ALLUSERSPROFILE -ChildPath $("MinikubeConfigurator-" + [System.DateTime]::Now.ToString("yyyy-MM-dd-HH-mm-ss"))
+if (-not $PSCommandPath) {
 
-# Location of the log files
-$ScriptLog = Join-Path -Path $MinikubeConfiguratorFolder -ChildPath "MinikubeConfigurator.log"
+    // $PSCommandPath is required
+    throw "The PSCommandPath is not given."
+}
+
+##################################################################################################
+
+#
+# Intialization
+#
+
+$ScriptName = [System.IO.Path]::GetFileNameWithoutExtension($PSCommandPath)
+$ScriptFolder = Join-Path $env:ALLUSERSPROFILE -ChildPath $("$ScriptName-" + [System.DateTime]::Now.ToString("yyyy-MM-dd-HH-mm-ss"))
+
+if (Test-Path ([System.IO.Path]::ChangeExtension($PSCommandPath, ".log")) -PathType Leaf) {
+
+    // use the current script folder as log location as it already contains a log file
+    $ScriptFolder = Split-Path -Path $PSCommandPath -Parent
+}
+
+$ScriptLog = Join-Path -Path $ScriptFolder -ChildPath "$ScriptName.log"
 
 ##################################################################################################
 
@@ -89,9 +105,9 @@ $ScriptLog = Join-Path -Path $MinikubeConfiguratorFolder -ChildPath "MinikubeCon
 
 function InitializeFolders
 {
-    if ($false -eq (Test-Path -Path $MinikubeConfiguratorFolder))
+    if (-not (Test-Path -Path $ScriptFolder))
     {
-        New-Item -Path $MinikubeConfiguratorFolder -ItemType directory | Out-Null
+        New-Item -Path $ScriptFolder -ItemType directory | Out-Null
     }
 }
 
@@ -119,13 +135,16 @@ function WriteLog
         [switch]$LogFileOnly
     )
 
-    $timestampedMessage = "[$([System.DateTime]::Now)] $Message" | % {
+    "[$([System.DateTime]::Now)] $Message" | ForEach-Object {
+    
         if (-not $LogFileOnly)
         {
             Write-Host -Object $_
         }
+    
         Out-File -InputObject $_ -FilePath $ScriptLog -Append
-    }
+
+    } | Out-Null
 }
 
 ##################################################################################################
@@ -175,13 +194,14 @@ try
 
     } else {
 
-        $postBootKey = Split-Path $MinikubeConfiguratorFolder -Leaf
-        #postBootCommand = "powershell.exe -ExecutionPolicy bypass `"& $PSCommandPath -Bootstrap`""
-        #postBootCommand = "powershell.exe -ExecutionPolicy bypass `"& '$($MyInvocation.MyCommand.Path))' -Bootstrap`""
-        $postBootCommand = "powershell.exe -ExecutionPolicy bypass -File `"$BootstrapFile`" -Bootstrap"
+        $postBootKey = Split-Path $ScriptFolder -Leaf
+        $postBootFile = Join-Path $PSScriptRoot (Split-Path $PSCommandPath -Leaf)
+        $postBootCommand = "powershell.exe -ExecutionPolicy bypass -File `"$postBootFile`" -Bootstrap"
+
+        WriteLog "Copy $PSCommandPath`n  to $postBootFile"
+        Copy-Item -Path $PSCommandPath -Destination $postBootFile -Force
 
         WriteLog "Register RunOnce script '$postBootKey': $postBootCommand"
-
         Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\RunOnce" -Name "!$postBootKey" -Value $postBootCommand
     }
 }
